@@ -147,6 +147,7 @@ Both scores are calculated with **plain arithmetic (rule-based logic)**, not a h
 
 | Phase | What I did |
 |---|---|
+
 | **1. Problem + Data** | Defined exactly what a recruiter needs to know day-to-day, and audited what the existing dataset could and couldn't answer |
 | **2. Dataset** | Extended the existing 835-candidate recruitment dataset into a full candidate lifecycle dataset (stage, offer date, follow-ups, joining date, response status, etc.), extensively cleaning shifted/misplaced columns (salary values sitting in notice-period fields, locations sitting in experience fields, and similar spreadsheet errors) row by row |
 | **3. Rule-based intelligence** | Built the Follow-up Priority Engine first, using only transparent point-based rules — no AI involved yet |

@@ -21,9 +21,8 @@ An AI-supported dashboard that tells recruiters exactly which candidates need at
 8. [Tech Stack](#-tech-stack)
 9. [Data Privacy](#-data-privacy)
 10. [Project Structure](#-project-structure)
-11. [Running It Yourself](#-running-it-yourself)
-12. [Limitations & What's Next](#-limitations--whats-next)
-13. [About This Project](#-about-this-project)
+11. [Limitations & What's Next](#-limitations--whats-next)
+12. [About This Project](#-about-this-project)
 
 ---
 
@@ -69,3 +68,143 @@ Every risk score, follow-up priority, and recommended action shown in the dashbo
 ## 🏗️ How It Works (Architecture)
 
 In plain terms: raw, messy recruiter spreadsheets go in one end, and a prioritized, explained, ready-to-act call list comes out the other end.
+
+
+
+
+                 Existing Recruitment Data 
+                                │
+                                ▼
+                ┌───────────────────────────────┐
+                │   Data Cleaning & Repair       │
+                │  (fix shifted columns, remove  │
+                │   duplicates, mask contact info)│
+                └───────────────┬───────────────┘
+                                ▼
+                 Candidate Lifecycle Dataset
+                (adds stage, offer, follow-up,
+                    and joining information)
+                                │
+            ┌───────────────────┴───────────────────┐
+            ▼                                        ▼
+┌───────────────────────┐                ┌───────────────────────┐
+│   Follow-up Engine     │                │     Risk Engine        │
+│  "Who needs action?"   │                │ "Who may not join?"    │
+└───────────┬────────────┘                └────────────┬───────────┘
+            │                                            │
+            └───────────────────┬────────────────────────┘
+                                 ▼
+                      Groq LLM (Llama-based model)
+                                 │
+                                 ▼
+                Plain-English Explanation + Recommended Action
+                                 │
+                                 ▼
+                      Recruiter Dashboard (Gradio)
+                        hosted on Render.com
+
+
+                        
+**Why this order matters:** the rule-based scoring (Follow-up Engine + Risk Engine) runs *first*, using transparent, explainable logic — not a black box. Only *after* a candidate is flagged does the AI step in, purely to translate the numbers into a clear explanation and message. This keeps every decision auditable: a recruiter can always see the raw signals behind an AI recommendation.
+
+##
+
+**1. Home screen — load a saved workbook or upload a fresh one**
+![Dashboard home screen](assets/01-overview-upload.png)
+
+**2. Overview tab — at-a-glance KPIs and risk distribution**
+![KPIs and risk distribution charts](assets/02-overview-kpis-charts.png)
+
+**3. Candidate Action Queue — every candidate, ranked by urgency, with filters**
+![Candidate action queue table](assets/03-candidate-action-queue.png)
+
+**4. Export tab — download a PII-safe report for the team**
+![Export tab](assets/04-export-tab.png)
+
+## 🧠 The Intelligence Layer — Explained Simply
+
+### Follow-up Priority (🟢 Normal → 🔴 Urgent)
+
+Think of this as a "how soon should I call this person" score. It goes up when:
+- It's been a while since the recruiter last spoke to the candidate
+- The candidate is at a sensitive stage (e.g., interview scheduled, offer pending)
+- There's a pending action nobody has completed yet
+- The candidate hasn't responded recently
+- Their joining date is getting close
+
+### Joining-Risk Score (0–100, Low / Medium / High)
+
+Think of this as "how likely is this candidate to disappear before their first day." It goes up when:
+- There's a **gap between what they expect and what they were offered**
+- Their **notice period is long** (more time = more chance of a counter-offer or change of heart)
+- They've **gone quiet** after previously responding
+- Their **joining date is approaching without confirmation**
+- **Relocation** is involved and unconfirmed
+
+Both scores are calculated with **plain arithmetic (rule-based logic)**, not a hidden AI model — so every score can be explained and defended. The AI (Groq/Llama) is only used *afterward*, to turn the score and its reasons into a natural-language explanation and a ready-to-send message. This was a deliberate design choice: recruiters need to trust *why* a candidate was flagged, not just accept a number.
+
+## 🪜 What I Actually Did (Step by Step)
+
+| Phase | What I did |
+|---|---|
+| **1. Problem + Data** | Defined exactly what a recruiter needs to know day-to-day, and audited what the existing dataset could and couldn't answer |
+| **2. Dataset** | Extended the existing 835-candidate recruitment dataset into a full candidate lifecycle dataset (stage, offer date, follow-ups, joining date, response status, etc.), extensively cleaning shifted/misplaced columns (salary values sitting in notice-period fields, locations sitting in experience fields, and similar spreadsheet errors) row by row |
+| **3. Rule-based intelligence** | Built the Follow-up Priority Engine first, using only transparent point-based rules — no AI involved yet |
+| **4. Risk model** | Built the Joining-Risk Engine the same way, so every risk score has a clear, auditable reason |
+| **5. Groq AI layer** | Connected the Groq API (Llama-family model) to turn each flagged candidate's data into a plain-English explanation, a recruiter task, and a WhatsApp-ready outreach message |
+| **6. UI** | Built the recruiter dashboard in Gradio — an Overview tab (KPIs + charts), a Candidate Action Queue (filterable, searchable table), and an Export tab |
+| **7. Testing** | Deliberately created edge cases to stress-test the logic: a candidate who never responds, one who accepts and then disappears, one with a large salary mismatch, one with a long notice period, and one who joins successfully — then verified the system flagged each one correctly |
+
+Finally, I packaged the app for deployment (`app.py`, `requirements.txt`, `runtime.txt`), pushed it to GitHub, and deployed it live on **Render**.
+
+## ⚙️ Tech Stack
+
+| Layer | Tools Used |
+|---|---|
+| **Data handling** | Python, Pandas, NumPy, Excel/CSV |
+| **Analysis / rule engine** | Pandas, NumPy, Scikit-learn utilities |
+| **AI layer** | Groq API (Llama-family instant model) for explanations and outreach messages |
+| **Visualization** | Plotly (interactive charts inside the dashboard) |
+| **Dashboard / UI** | Gradio |
+| **Development** | Google Colab (build + test), GitHub (version control) |
+| **Deployment** | Render.com |
+
+## 🔒 Data Privacy
+
+Since this dataset contains real (though repurposed) recruiter records, privacy was treated as a first-class requirement, not an afterthought:
+
+- All phone numbers and email addresses are replaced with masked/dummy identifiers before the data reaches the AI layer or the public dashboard
+- The **Export** tab explicitly strips phone numbers and email addresses from any downloaded file
+- The AI (Groq) never receives raw contact information — only role, stage, and risk-related fields
+
+## 📁 Project Structure
+
+recruitment-intelligence-dashboard/
+├── app.py # Gradio dashboard application
+├── requirements.txt # Python dependencies
+├── runtime.txt # Pinned Python version for Render
+├── recruitment_dashboard_with_groq_messages.xlsx # Processed dataset used by the app
+├── Recruitment_Intelligence_Final.ipynb # Full build notebook (data cleaning → risk engine → AI layer → dashboard)
+└── assets/ # Screenshots used in this README
+
+
+
+## 🚧 Limitations & What's Next
+
+- **Offer/joining fields are synthetic.** The recruiter-activity fields (recruiter, salary, notice period, location, etc.) are real; the lifecycle fields (offer date, follow-up count, joining date) were generated realistically from that real data, since the original dataset never tracked the offer-to-joining journey.
+- **Risk thresholds are rule-based, not learned.** The next step would be training a proper ML classifier (scikit-learn) on real joining outcomes once enough labeled data exists, and comparing it against the current rule-based scores.
+- **Single-language outreach.** Messages are currently generated in English only.
+- **No live CRM integration yet.** The dashboard currently works from an uploaded/saved workbook rather than a live database connection.
+
+## 👤 About This Project
+
+Built by **Priya A** — Cloud/DevOps engineer transitioning into AI/ML & Data Science, currently pursuing a PGDM in Artificial Intelligence & Data Science.
+
+
+
+
+
+
+
+
+                        

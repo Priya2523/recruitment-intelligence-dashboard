@@ -5,6 +5,8 @@
 An AI-supported dashboard that tells recruiters exactly which candidates need attention, how likely they are to actually join after accepting an offer, and what to say to them — automatically.
 
 🔗 **Live App:** [recruitment-intelligence-dashboard.onrender.com](https://recruitment-intelligence-dashboard.onrender.com)
+
+
 💻 **Code:** [github.com/Priya2523/recruitment-intelligence-dashboard](https://github.com/Priya2523/recruitment-intelligence-dashboard)
 
 ---
@@ -69,10 +71,8 @@ Every risk score, follow-up priority, and recommended action shown in the dashbo
 
 In plain terms: raw, messy recruiter spreadsheets go in one end, and a prioritized, explained, ready-to-act call list comes out the other end.
 
-
-
-
-                 Existing Recruitment Data 
+```
+                 Existing Recruitment Data
                                 │
                                 ▼
                 ┌───────────────────────────────┐
@@ -102,12 +102,11 @@ In plain terms: raw, messy recruiter spreadsheets go in one end, and a prioritiz
                                  ▼
                       Recruiter Dashboard (Gradio)
                         hosted on Render.com
+```
 
-
-                        
 **Why this order matters:** the rule-based scoring (Follow-up Engine + Risk Engine) runs *first*, using transparent, explainable logic — not a black box. Only *after* a candidate is flagged does the AI step in, purely to translate the numbers into a clear explanation and message. This keeps every decision auditable: a recruiter can always see the raw signals behind an AI recommendation.
 
-##
+## 📸 Screenshots
 
 **1. Home screen — load a saved workbook or upload a fresh one**
 ![Dashboard home screen](assets/01-overview-upload.png)
@@ -147,7 +146,6 @@ Both scores are calculated with **plain arithmetic (rule-based logic)**, not a h
 
 | Phase | What I did |
 |---|---|
-
 | **1. Problem + Data** | Defined exactly what a recruiter needs to know day-to-day, and audited what the existing dataset could and couldn't answer |
 | **2. Dataset** | Extended the existing 835-candidate recruitment dataset into a full candidate lifecycle dataset (stage, offer date, follow-ups, joining date, response status, etc.), extensively cleaning shifted/misplaced columns (salary values sitting in notice-period fields, locations sitting in experience fields, and similar spreadsheet errors) row by row |
 | **3. Rule-based intelligence** | Built the Follow-up Priority Engine first, using only transparent point-based rules — no AI involved yet |
@@ -180,15 +178,15 @@ Since this dataset contains real (though repurposed) recruiter records, privacy 
 
 ## 📁 Project Structure
 
+```
 recruitment-intelligence-dashboard/
-├── app.py # Gradio dashboard application
-├── requirements.txt # Python dependencies
-├── runtime.txt # Pinned Python version for Render
-├── recruitment_dashboard_with_groq_messages.xlsx # Processed dataset used by the app
-├── Recruitment_Intelligence_Final.ipynb # Full build notebook (data cleaning → risk engine → AI layer → dashboard)
-└── assets/ # Screenshots used in this README
-
-
+├── app.py                                          # Gradio dashboard application
+├── requirements.txt                                # Python dependencies
+├── runtime.txt                                      # Pinned Python version for Render
+├── recruitment_dashboard_with_groq_messages.xlsx    # Processed dataset used by the app
+├── Recruitment_Intelligence_Final.ipynb            # Full build notebook (data cleaning → risk engine → AI layer → dashboard)
+└── assets/                                          # Screenshots used in this README
+```
 
 ## 🚧 Limitations & What's Next
 
@@ -200,12 +198,3 @@ recruitment-intelligence-dashboard/
 ## 👤 About This Project
 
 Built by **Priya A** — Cloud/DevOps engineer transitioning into AI/ML & Data Science, currently pursuing a PGDM in Artificial Intelligence & Data Science.
-
-
-
-
-
-
-
-
-                        
